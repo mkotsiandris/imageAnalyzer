@@ -7,15 +7,30 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.stream.ImageInputStream;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.Iterator;
 
 public class Image {
 
     String filePath;
+    private int height;
+    private int width;
 
     public Image(String thePath) {
         this.filePath = String.valueOf(thePath);
+        this.getSize();
+    }
+
+    private void getSize(){
+        try {
+            File imageFile = new File(this.filePath);
+            BufferedImage imageBuffer = ImageIO.read(imageFile);
+            this.height = imageBuffer.getHeight();
+            this.width = imageBuffer.getWidth();
+        } catch (IOException e){
+            e.printStackTrace();
+        }
     }
 
     public void readImageAndDisplayMetaData() {
@@ -84,5 +99,17 @@ public class Image {
         // print close tag of element
         indent(level);
         System.out.println("</" + node.getNodeName() + ">");
+    }
+
+    /*
+        @Category Getters and Setters
+     */
+
+    public int getHeight() {
+        return height;
+    }
+
+    public int getWidth() {
+        return width;
     }
 }
