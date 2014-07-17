@@ -1,14 +1,15 @@
 package com.thesis;
 
-import com.thesis.com.thesis.models.Image;
+import com.thesis.models.ImageModel;
+
 
 public class Main {
 
-    public static void main(String[] args) {
-        Image theImage = new Image("/Users/cerebro/Projects/masterthesis/marios.jpg");
-        System.out.println(theImage.getHeight());
-        System.out.println(theImage.getWidth());
-        theImage.readImageAndDisplayMetaData();
+	public static void main(String[] args) {
+		ImageModel theImage = new ImageModel("/Users/cerebro/Projects/masterthesis/marios.jpg");
+		System.out.println(theImage.getHeight());
+		System.out.println(theImage.getWidth());
+		theImage.readImageAndDisplayMetaData();
 
-    }
+	}
 }
