@@ -1,5 +1,11 @@
 package com.thesis.models;
 
+import ij.IJ;
+import ij.ImagePlus;
+import ij.io.Opener;
+import ij.measure.Measurements;
+import ij.measure.ResultsTable;
+import ij.plugin.filter.Analyzer;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
@@ -9,17 +15,53 @@ import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.stream.ImageInputStream;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.net.URL;
 import java.util.Iterator;
 
 public class ImageModel {
 
-	String filePath;
+	public String filePath;
 	private int height;
 	private int width;
+	private ImagePlus imp;
+	public Double porosity;
+	public Double area;
+	public Double min;
+	public Double max;
+
 
 	public ImageModel(String thePath) {
 		this.filePath = String.valueOf(thePath);
+		this.initializeImageBasics();
+	}
+
+	private void initializeImageBasics(){
 		this.getSize();
+		this.imp = IJ.openImage(this.filePath);
+	}
+
+	public Double getPorosity(){
+		imp.getProcessor().setAutoThreshold("Default");
+		int measurements =
+				Measurements.AREA +
+				Measurements.MEAN +
+				Measurements.MIN_MAX +
+				Measurements.STD_DEV +
+				Measurements.MODE +
+				Measurements.MEDIAN +
+				Measurements.AREA_FRACTION +
+				Measurements.LIMIT;
+
+		ResultsTable rt = new ResultsTable();
+		Analyzer analyzer = new Analyzer(imp, measurements, rt);
+		analyzer.measure();
+
+		this.porosity = rt.getValue("%Area", rt.getCounter() - 1);
+		this.area = rt.getValue("Area", rt.getCounter() - 1);
+		this.min = rt.getValue("Min", rt.getCounter() - 1);
+		this.max = rt.getValue("Max", rt.getCounter() - 1);
+
+		return this.porosity;
 	}
 
 	private void getSize(){
