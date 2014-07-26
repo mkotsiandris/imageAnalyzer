@@ -2,7 +2,6 @@ package com.thesis.models;
 
 import ij.IJ;
 import ij.ImagePlus;
-import ij.io.Opener;
 import ij.measure.Measurements;
 import ij.measure.ResultsTable;
 import ij.plugin.filter.Analyzer;
@@ -15,12 +14,18 @@ import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.stream.ImageInputStream;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.net.URL;
 import java.util.Iterator;
 
 public class ImageModel {
 
+	final int GRAY8 = 1;
+	final int GRAY16 = 2;
+	final int GRAY32 = 3;
+	final int COLOR_256 = 4;
+	final int COLOR_RGB = 5;
+
 	public String filePath;
+	public String type;
 	private int height;
 	private int width;
 	private ImagePlus imp;
@@ -36,8 +41,17 @@ public class ImageModel {
 	}
 
 	private void initializeImageBasics(){
-		this.getSize();
-		this.imp = IJ.openImage(this.filePath);
+		try{
+			File imageFile = new File(this.filePath);
+			if(imageFile.exists() && !imageFile.isDirectory()) {
+				this.imp = IJ.openImage(this.filePath);
+				this.getImageType();
+				this.height = this.imp.getHeight();
+				this.width = this.imp.getWidth();
+			}
+		}catch (Exception e){
+			e.printStackTrace();
+		}
 	}
 
 	public Double getPorosity(){
@@ -60,19 +74,18 @@ public class ImageModel {
 		this.area = rt.getValue("Area", rt.getCounter() - 1);
 		this.min = rt.getValue("Min", rt.getCounter() - 1);
 		this.max = rt.getValue("Max", rt.getCounter() - 1);
+		rt.reset();
 
 		return this.porosity;
 	}
 
-	private void getSize(){
-		try {
-			File imageFile = new File(this.filePath);
-			BufferedImage imageBuffer = ImageIO.read(imageFile);
-			this.height = imageBuffer.getHeight();
-			this.width = imageBuffer.getWidth();
-		} catch (IOException e){
-			e.printStackTrace();
-		}
+	/*
+		@Category Getters and Setters
+	 */
+
+
+	public void countParcicles(){
+		this.imp.getProcessor().setAutoThreshold("Default");
 	}
 
 	public void readImageAndDisplayMetaData() {
@@ -143,15 +156,20 @@ public class ImageModel {
 		System.out.println("</" + node.getNodeName() + ">");
 	}
 
-	/*
-		@Category Getters and Setters
-	 */
+	public void getImageType(){
+		int type = this.imp.getType();
+		switch (type) {
+			case 1 :
+				this.type = "GRAY8";
+			case 2:
+				this.type = "GRAY16";
+			case 3:
+				this.type = "GRAY32";
+			case 4:
+				this.type = "COLOR_256";
+			case 5:
+				this.type = "COLOR_RGB";
+		}
 
-	public int getHeight() {
-		return height;
-	}
-
-	public int getWidth() {
-		return width;
 	}
 }
