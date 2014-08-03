@@ -5,6 +5,7 @@ import ij.ImagePlus;
 import ij.measure.Measurements;
 import ij.measure.ResultsTable;
 import ij.plugin.filter.Analyzer;
+import ij.plugin.filter.ParticleAnalyzer;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
@@ -86,6 +87,15 @@ public class ImageModel {
 
 	public void countParcicles(){
 		this.imp.getProcessor().setAutoThreshold("Default");
+		this.imp.setRoi(0, 0, this.width, this.height-100);
+		int measurments = Measurements.AREA+
+						  Measurements.FERET+
+						  Measurements.PERIMETER+
+						  Measurements.CIRCULARITY;
+		ResultsTable rt = new ResultsTable();
+		ParticleAnalyzer particleAnalyzer = new ParticleAnalyzer(ParticleAnalyzer.SHOW_OUTLINES, measurments,rt, 10, 99999);
+		particleAnalyzer.analyze(imp);
+		rt.show("My analyzer");
 	}
 
 	public void readImageAndDisplayMetaData() {
