@@ -1,5 +1,8 @@
 package com.thesis.models;
 
+import com.thesis.helpers.ImageModelHelper;
+import com.thesis.helpers.ProcessHelper;
+import com.thesis.helpers.ValidationHelper;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.measure.Measurements;
@@ -17,169 +20,60 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.Iterator;
 
-public class ImageModel {
-
-	final int GRAY8 = 1;
-	final int GRAY16 = 2;
-	final int GRAY32 = 3;
-	final int COLOR_256 = 4;
-	final int COLOR_RGB = 5;
+public class ImageModel extends ImagePlus {
 
 	public String filePath;
 	public String type;
-	private int height;
-	private int width;
+	private int height = -1;
+	private int width = -1;
 	private ImagePlus imp;
-	public Double porosity;
-	public Double area;
-	public Double min;
-	public Double max;
+	public Double porosity = -1.0;
 
 
 	public ImageModel(String thePath) {
 		this.filePath = String.valueOf(thePath);
-		this.initializeImageBasics();
+		this.imp = IJ.openImage(this.filePath);
 	}
 
-	private void initializeImageBasics(){
-		try{
-			File imageFile = new File(this.filePath);
-			if(imageFile.exists() && !imageFile.isDirectory()) {
-				this.imp = IJ.openImage(this.filePath);
-				this.getImageType();
-				this.height = this.imp.getHeight();
-				this.width = this.imp.getWidth();
-			}
-		}catch (Exception e){
-			e.printStackTrace();
+	private void validateFilepath(String filePath) {
+		if (ValidationHelper.isFilePathValid(filePath)) {
+		} else {
+			System.out.println("The filepath you are providing is not valid");
 		}
 	}
 
-	public Double getPorosity(){
-		imp.getProcessor().setAutoThreshold("Default");
-		int measurements =
-				Measurements.AREA +
-				Measurements.MEAN +
-				Measurements.MIN_MAX +
-				Measurements.STD_DEV +
-				Measurements.MODE +
-				Measurements.MEDIAN +
-				Measurements.AREA_FRACTION +
-				Measurements.LIMIT;
-
-		ResultsTable rt = new ResultsTable();
-		Analyzer analyzer = new Analyzer(imp, measurements, rt);
-		analyzer.measure();
-
-		this.porosity = rt.getValue("%Area", rt.getCounter() - 1);
-		this.area = rt.getValue("Area", rt.getCounter() - 1);
-		this.min = rt.getValue("Min", rt.getCounter() - 1);
-		this.max = rt.getValue("Max", rt.getCounter() - 1);
-		rt.reset();
-
+	public Double calculatePorosityProcess() {
+		ProcessHelper processHelper = new ProcessHelper(this.filePath);
+		this.porosity = processHelper.getPorosity();
 		return this.porosity;
 	}
 
-	/*
-		@Category Getters and Setters
-	 */
-
-
-	public void countParcicles(){
-		this.imp.getProcessor().setAutoThreshold("Default");
-		this.imp.setRoi(0, 0, this.width, this.height-100);
-		int measurments = Measurements.AREA+
-						  Measurements.FERET+
-						  Measurements.PERIMETER+
-						  Measurements.CIRCULARITY;
-		ResultsTable rt = new ResultsTable();
-		ParticleAnalyzer particleAnalyzer = new ParticleAnalyzer(ParticleAnalyzer.SHOW_OUTLINES, measurments,rt, 10, 99999);
-		particleAnalyzer.analyze(imp);
-		rt.show("My analyzer");
+	public void countParticlesProcess() {
+		ProcessHelper processHelper = new ProcessHelper(this.filePath);
+		processHelper.countParcicles(this.getImageWidth(), this.getImageHeight());
 	}
 
-	public void readImageAndDisplayMetaData() {
-		try {
-			File file = new File(this.filePath);
-			ImageInputStream imageInputStream = ImageIO.createImageInputStream(file);
-			Iterator<ImageReader> readers = ImageIO.getImageReaders(imageInputStream);
+	public void displayImageMetaData() {
+		ImageModelHelper.readImageAndDisplayMetaData(this.filePath);
+	}
 
-			if (readers.hasNext()) {
-				ImageReader reader = readers.next();
-				reader.setInput(imageInputStream, true);
-				IIOMetadata metadata = reader.getImageMetadata(0);
 
-				String[] names = metadata.getMetadataFormatNames();
-				int length = names.length;
-				for (int i = 0; i < length; i++) {
-					System.out.println( "Format name: " + names[ i ] );
-					displayMetadata(metadata.getAsTree(names[i]));
-				}
-			}
-		} catch(Exception e) {
-			e.printStackTrace();
+	public String getImageType() {
+		return ImageModelHelper.getImageType(this);
+	}
+
+	public int getImageHeight() {
+		if (this.height == -1) {
+			this.height = this.imp.getHeight();
 		}
+		return this.height;
 	}
 
-	void displayMetadata(Node root) {
-		displayMetadata(root, 0);
-	}
-
-	void indent(int level) {
-		for (int i = 0; i < level; i++)
-			System.out.print("    ");
-	}
-
-	void displayMetadata(Node node, int level) {
-		// print open tag of element
-		indent(level);
-		System.out.print("<" + node.getNodeName());
-		NamedNodeMap map = node.getAttributes();
-		if (map != null) {
-
-			// print attribute values
-			int length = map.getLength();
-			for (int i = 0; i < length; i++) {
-				Node attr = map.item(i);
-				System.out.print(" " + attr.getNodeName() +
-						"=\"" + attr.getNodeValue() + "\"");
-			}
+	public int getImageWidth() {
+		if (this.width == -1) {
+			this.width = this.imp.getWidth();
 		}
-
-		Node child = node.getFirstChild();
-		if (child == null) {
-			// no children, so close element and return
-			System.out.println("/>");
-			return;
-		}
-
-		// children, so close current tag
-		System.out.println(">");
-		while (child != null) {
-			// print children recursively
-			displayMetadata(child, level + 1);
-			child = child.getNextSibling();
-		}
-
-		// print close tag of element
-		indent(level);
-		System.out.println("</" + node.getNodeName() + ">");
+		return this.width;
 	}
 
-	public void getImageType(){
-		int type = this.imp.getType();
-		switch (type) {
-			case 1 :
-				this.type = "GRAY8";
-			case 2:
-				this.type = "GRAY16";
-			case 3:
-				this.type = "GRAY32";
-			case 4:
-				this.type = "COLOR_256";
-			case 5:
-				this.type = "COLOR_RGB";
-		}
-
-	}
 }

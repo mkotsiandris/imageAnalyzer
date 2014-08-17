@@ -6,8 +6,6 @@ public class Main {
 
 	public static void main(String[] args) {
 		ImageModel imageModel = new ImageModel("rsz_30nm.png");
-//		imageModel.readImageAndDisplayMetaData();
-//		System.out.println("The porosity of this image is"+ imageModel.getPorosity());
-		imageModel.countParcicles();
+		System.out.println(imageModel.calculatePorosityProcess().toString());
 	}
 }
