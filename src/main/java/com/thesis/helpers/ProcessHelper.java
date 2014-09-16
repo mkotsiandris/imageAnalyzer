@@ -1,6 +1,6 @@
+
 package com.thesis.helpers;
 
-import com.thesis.models.ImageModel;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.measure.Measurements;
@@ -9,6 +9,7 @@ import ij.plugin.filter.Analyzer;
 import ij.plugin.filter.ParticleAnalyzer;
 import ij.process.ImageConverter;
 import ij.process.ImageProcessor;
+import java.util.HashMap;
 
 /**
  * Created by cerebro on 8/17/14.
@@ -25,11 +26,13 @@ public class ProcessHelper {
 		imageConverter.convertToGray8();
 	}
 
-	public Double getPorosity() throws NullPointerException{
-		Double porosity = 0.0;
-		Double area = 0.0;
-		Double max = 0.0;
-		Double min = 0.0;
+	public HashMap<String, Double> getPorosity() throws NullPointerException{
+		Double porosity;
+		Double area;
+		Double max;
+		Double min;
+		HashMap<String, Double> resultsMap = new HashMap<>();
+
 		try{
 			this.imagePlus.getProcessor().setAutoThreshold("Default");
 			int measurements =
@@ -45,22 +48,30 @@ public class ProcessHelper {
 			ResultsTable rt = new ResultsTable();
 			Analyzer analyzer = new Analyzer(this.imagePlus, measurements, rt);
 			analyzer.measure();
-
 			porosity = rt.getValue("%Area", rt.getCounter() - 1);
 			area = rt.getValue("Area", rt.getCounter() - 1);
 			min = rt.getValue("Min", rt.getCounter() - 1);
 			max = rt.getValue("Max", rt.getCounter() - 1);
+
+			resultsMap.put("porosity", porosity);
+			resultsMap.put("area", area);
+			resultsMap.put("min", min);
+			resultsMap.put("max", max);
+
 			rt.reset();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
-			return porosity;
+			return resultsMap;
 	}
 
-	public void countParcicles(int width, int height){
+	public void countParcicles(int width, int height, String thesholdType){
 		try {
-			this.imagePlus.getProcessor().setAutoThreshold("Default");
-	//		this.imagePlus.setRoi(0, 0, width, height - 100);
+//			adaptiveThr_ adaptiveThr = new adaptiveThr_();
+//			adaptiveThr.run(this.imageProcessor);
+			this.imagePlus.getProcessor().setAutoThreshold(thesholdType);
+			this.imagePlus.show();
+//			this.imagePlus.setRoi(0, 0, width, height - 500);
 			int measurments = Measurements.AREA+
 					Measurements.FERET+
 					Measurements.PERIMETER+
@@ -73,6 +84,5 @@ public class ProcessHelper {
 			System.out.println("Exception on countParticles");
 			e.printStackTrace();
 		}
-
 	}
 }

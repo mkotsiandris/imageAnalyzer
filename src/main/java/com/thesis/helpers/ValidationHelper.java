@@ -17,4 +17,25 @@ public class ValidationHelper {
 		}
 		return false;
 	}
+
+	public static boolean isThresholdTypeValid(String thresholdType) {
+		switch (thresholdType) {
+			case "Default":
+				return true;
+			case "Huang":
+				return true;
+			case "Intermodes":
+				return true;
+			case "IsoData":
+				return true;
+			case "IJ_IsoData":
+				return true;
+			case "Percentile":
+				return true;
+			case "Triangle":
+				return true;
+		}
+
+		return false;
+	}
 }

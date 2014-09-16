@@ -17,8 +17,14 @@ public class Main {
 				.withValueSeparator()
 				.withDescription( "enter the function you want to run" )
 				.create( "function" );
+		Option thresholdProperty  = OptionBuilder.withArgName("property=value")
+				.hasArgs(2)
+				.withValueSeparator()
+				.withDescription( "enter the function you want to run" )
+				.create( "threshold" );
 		options.addOption(fileNameProperty);
 		options.addOption(functionProperty);
+		options.addOption(thresholdProperty);
 		// create the parser
 		CommandLineParser parser = new GnuParser();
 
@@ -34,7 +40,13 @@ public class Main {
 							if (function.equals("p")){
 								System.out.println(imageModel.calculatePorosityProcess().toString());
 							} else if (function.equals("c")) {
-								imageModel.countParticlesProcess();
+								String threshold;
+								if (line.hasOption("threshold")){
+									threshold = line.getOptionValue("threshold");
+								} else {
+									threshold = "Default";
+								}
+								imageModel.countParticlesProcess("threshold");
 							}
 						}
 					}
@@ -44,6 +56,7 @@ public class Main {
 //			HelpFormatter formatter = new HelpFormatter();
 //			formatter.printHelp("help", options );
 			System.err.println( "Parsing failed.  Reason: " + exp.getMessage() );
+		} finally {
 		}
 	}
 }
