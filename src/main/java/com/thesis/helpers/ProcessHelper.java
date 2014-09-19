@@ -9,6 +9,10 @@ import ij.plugin.filter.Analyzer;
 import ij.plugin.filter.ParticleAnalyzer;
 import ij.process.ImageConverter;
 import ij.process.ImageProcessor;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.HashMap;
 
 /**
@@ -65,19 +69,17 @@ public class ProcessHelper {
 			return resultsMap;
 	}
 
-	public void countParcicles(int width, int height, String thesholdType){
+	public void countParcicles(String thesholdType) {
 		try {
-//			adaptiveThr_ adaptiveThr = new adaptiveThr_();
-//			adaptiveThr.run(this.imageProcessor);
 			this.imagePlus.getProcessor().setAutoThreshold(thesholdType);
 			this.imagePlus.show();
 //			this.imagePlus.setRoi(0, 0, width, height - 500);
-			int measurments = Measurements.AREA+
-					Measurements.FERET+
-					Measurements.PERIMETER+
+			int measurments = Measurements.AREA +
+					Measurements.FERET +
+					Measurements.PERIMETER +
 					Measurements.CIRCULARITY;
 			ResultsTable rt = new ResultsTable();
-			ParticleAnalyzer particleAnalyzer = new ParticleAnalyzer(ParticleAnalyzer.SHOW_OUTLINES, measurments,rt, 10, 99999);
+			ParticleAnalyzer particleAnalyzer = new ParticleAnalyzer(ParticleAnalyzer.SHOW_OUTLINES, measurments, rt, 10, 99999);
 			particleAnalyzer.analyze(this.imagePlus);
 			rt.show("My analyzer");
 		} catch (Exception e) {
@@ -85,4 +87,25 @@ public class ProcessHelper {
 			e.printStackTrace();
 		}
 	}
+
+	public static void cropAndResize(ImagePlus imp, int targetWidth, int targetHeight) throws Exception{
+		ImageProcessor ip = imp.getProcessor();
+		System.out.println("size1: "+ip.getWidth()+"x"+ip.getHeight());
+		ip.setInterpolationMethod(ImageProcessor.BILINEAR);
+		ip = ip.resize(targetWidth * 2, targetHeight * 2);
+		System.out.println("size2: "+ip.getWidth()+"x"+ip.getHeight());
+
+		int cropX = ip.getWidth() / 2;
+		int cropY = ip.getHeight() / 2;
+		ip.setRoi(cropX, cropY, targetWidth, targetHeight);
+		ip = ip.crop();
+		System.out.println("size3: "+ip.getWidth()+"x"+ip.getHeight());
+		BufferedImage croppedImage = ip.getBufferedImage();
+
+		System.out.println("size4: "+ip.getWidth()+"x"+ip.getHeight());
+		new ImagePlus("croppedImage", croppedImage).show();
+
+		ImageIO.write(croppedImage, "jpg", new File("cropped.jpg"));
+	}
+}
 }

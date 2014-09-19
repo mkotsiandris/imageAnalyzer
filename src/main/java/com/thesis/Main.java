@@ -46,7 +46,7 @@ public class Main {
 								} else {
 									threshold = "Default";
 								}
-								imageModel.countParticlesProcess("threshold");
+								imageModel.countParticlesProcess(threshold);
 							}
 						}
 					}

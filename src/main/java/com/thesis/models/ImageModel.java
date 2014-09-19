@@ -51,7 +51,7 @@ public class ImageModel extends ImagePlus {
 	public void countParticlesProcess(String thresholdType) {
 		ProcessHelper processHelper = new ProcessHelper(this.filePath);
 		if (ValidationHelper.isThresholdTypeValid(thresholdType)){
-			processHelper.countParcicles(this.getImageWidth(), this.getImageHeight(), thresholdType);
+			processHelper.countParcicles(thresholdType);
 		}
 	}
 
