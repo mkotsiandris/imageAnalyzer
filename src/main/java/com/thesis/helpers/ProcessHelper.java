@@ -108,4 +108,4 @@ public class ProcessHelper {
 		ImageIO.write(croppedImage, "jpg", new File("cropped.jpg"));
 	}
 }
-}
+
