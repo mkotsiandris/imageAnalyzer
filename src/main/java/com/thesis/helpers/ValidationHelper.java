@@ -11,8 +11,10 @@ public class ValidationHelper {
 			if (imageFile.exists() && !imageFile.isDirectory()) {
 				return true;
 			} else
+				System.out.println("The filepath you provided is not valid.");
 				return false;
 		} catch (Exception e) {
+			System.out.println("Something wrong happened.");
 			e.printStackTrace();
 		}
 		return false;
@@ -35,7 +37,6 @@ public class ValidationHelper {
 			case "Triangle":
 				return true;
 		}
-
 		return false;
 	}
 }

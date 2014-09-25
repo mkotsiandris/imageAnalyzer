@@ -20,7 +20,7 @@ public class Main {
 		Option thresholdProperty  = OptionBuilder.withArgName("property=value")
 				.hasArgs(2)
 				.withValueSeparator()
-				.withDescription( "enter the function you want to run" )
+				.withDescription( "enter the threshold you want to apply" )
 				.create( "threshold" );
 		options.addOption(fileNameProperty);
 		options.addOption(functionProperty);

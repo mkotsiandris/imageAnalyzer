@@ -3,6 +3,7 @@ package com.thesis.helpers;
 
 import ij.IJ;
 import ij.ImagePlus;
+import ij.measure.Calibration;
 import ij.measure.Measurements;
 import ij.measure.ResultsTable;
 import ij.plugin.filter.Analyzer;
@@ -106,6 +107,17 @@ public class ProcessHelper {
 		new ImagePlus("croppedImage", croppedImage).show();
 
 		ImageIO.write(croppedImage, "jpg", new File("cropped.jpg"));
+	}
+
+	public void calibrateImage(double pX, double pY, String unit, ImagePlus imp) {
+		double originX = 0.0;
+		double originY = 0.0;
+		Calibration cal = imp.getCalibration();
+		cal.setUnit(unit);
+		cal.pixelWidth = pX;
+		cal.pixelHeight = pY;
+		cal.xOrigin = originX / pX;
+		cal.yOrigin = originY / pY;
 	}
 }
 
