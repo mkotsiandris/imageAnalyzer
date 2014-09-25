@@ -67,7 +67,7 @@ public class ProcessHelper {
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
-			return resultsMap;
+		return resultsMap;
 	}
 
 	public void countParcicles(String thesholdType) {

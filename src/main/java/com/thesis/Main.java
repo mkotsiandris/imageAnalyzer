@@ -35,22 +35,22 @@ public class Main {
 				// initialise the member variable
 				String fileName = line.getOptionValue( "fileName" );
 				ImageModel imageModel = new ImageModel(fileName);
-					if (line.hasOption("function")){
-						String function = line.getOptionValue("function");
-							if (function.equals("p")){
-								System.out.println(imageModel.calculatePorosityProcess().toString());
-							} else if (function.equals("c")) {
-								String threshold;
-								if (line.hasOption("threshold")){
-									threshold = line.getOptionValue("threshold");
-								} else {
-									threshold = "Default";
-								}
-								imageModel.countParticlesProcess(threshold);
-							}
+				if (line.hasOption("function")){
+					String function = line.getOptionValue("function");
+					if (function.equals("p")){
+						System.out.println(imageModel.calculatePorosityProcess().toString());
+					} else if (function.equals("c")) {
+						String threshold;
+						if (line.hasOption("threshold")){
+							threshold = line.getOptionValue("threshold");
+						} else {
+							threshold = "Default";
 						}
+						imageModel.countParticlesProcess(threshold);
 					}
-			} catch (ParseException exp) {
+				}
+			}
+		} catch (ParseException exp) {
 			exp.printStackTrace();
 			// oops, something went wrong
 //			HelpFormatter formatter = new HelpFormatter();

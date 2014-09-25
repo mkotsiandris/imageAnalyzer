@@ -12,7 +12,7 @@ public class ValidationHelper {
 				return true;
 			} else
 				System.out.println("The filepath you provided is not valid.");
-				return false;
+			return false;
 		} catch (Exception e) {
 			System.out.println("Something wrong happened.");
 			e.printStackTrace();
